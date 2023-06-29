@@ -36,9 +36,17 @@ You should have something like this:
 
 Once you have filled all of the information out you can close auth.json and double click on OF DRM.exe and you should be ready to start downloading videos.
 
-# Config Values
-In the auth.json file you can choose if you want to download posts or not.
+#Videos
+This scraper is aimed to download DRM videos only and nothing else.
 
+You will get the choice to:
+-Download None of the videos found
+-Download All of the videos found
+-Select individual videos found, you will be able to see the Post/Message Id along with DateTime of that Post/Message.
+
+To navigate the menu the can use the &#8593; & &#8595; arrows, to select/deselect an account press the `space` key and after you are happy with your selection(s) press `enter` to start downloading.
+
+# Config Values
 `DownloadPaidPosts`:
 If set to `true` then any posts on the users feed that have been purchased by you and have DRM enabled videos will be scraped.
 If set to `false` no paid posts will be scraped.
@@ -58,6 +66,10 @@ If set to `false` no free messages will be scraped.
 `DownloadPaidMessages`:
 If set to `true` then any paid messages that have been purchased by you and have DRM enabled videos will be scraped.
 If set to `false` no paid messages will be scraped.
+
+`IncludeExpiredSubscriptions`:
+If set to `true` then any past subscriptions that aren't currently active are included in the list of accounts you can scrape.
+If set to `false` then any past subscriptions are excluded from the list of accounts you can scrape from.
 
 # Donations
 If you would like to donate then here is a link to my ko-fi page https://ko-fi.com/sim0n00ps. Donations are not required but are very much appreciated:)

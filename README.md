@@ -22,7 +22,7 @@ Next you need to fill out the auth.json file.
 4. Click on one of the requests (if nothing shows up refresh the page or click on one of the tabs such as messages to make something appear).
 5. After clicking on a request, make sure the headers tab is selected and then scroll down to find the 'Request Headers' section, this is where you should be able to find the information you need.
 6. Copy the values of `cookie`, `user-agent`, `user-id` (this should just be a number, do not include a `u`) and `x-bc` to the `auth.json` file where the paths to yt-dlp, ffmpeg and mp4decrypt should already be.
-7. Save the file and you should be ready to go!
+7. Save the file.
 
 You should have something like this:
 

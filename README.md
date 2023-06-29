@@ -36,7 +36,7 @@ You should have something like this:
 
 Once you have filled all of the information out you can close auth.json and double click on OF DRM.exe and you should be ready to start downloading videos.
 
-#Videos
+# Videos
 This scraper is aimed to download DRM videos only and nothing else.
 
 You will get the choice to:

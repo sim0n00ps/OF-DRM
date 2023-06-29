@@ -44,7 +44,7 @@ You will get the choice to:
 - Download All of the videos found
 - Select individual videos found, you will be able to see the Post/Message Id along with DateTime of that Post/Message.
 
-To navigate the menu the can use the &#8593; & &#8595; arrows, to select/deselect an account press the `space` key and after you are happy with your selection(s) press `enter` to start downloading.
+To navigate the menu the can use the &#8593; & &#8595; arrows, to select/deselect video(s) press the `space` key and after you are happy with your selection(s) press `enter` to start downloading.
 
 # Config Values
 `DownloadPaidPosts`:

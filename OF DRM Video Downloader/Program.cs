@@ -30,9 +30,8 @@ namespace OF_DRM_Video_Downloader
         {
             try
             {
-                AnsiConsole.Write(new FigletText("Welcome to OF-DRM").Color(Color.Red));
+                AnsiConsole.Write(new FigletText("OF-DRM").Color(Color.Red));
                 DateTime startTime = DateTime.Now;
-                bool exitProgram = false;
 
                 if (!File.Exists(auth.YTDLP_PATH))
                 {
@@ -89,8 +88,6 @@ namespace OF_DRM_Video_Downloader
                             // Iterate over each user in the list of users
                             foreach (KeyValuePair<string, int> user in hasSelectedUsersKVP.Value)
                             {
-                                int paidPostCount = 0;
-                                int postCount = 0;
                                 AnsiConsole.Markup($"[red]\nScraping Data for {user.Key}\n[/]");
                                 string path = $"__user_data__/sites/OnlyFans/{user.Key}";
                                 if (!Directory.Exists(path))
@@ -149,45 +146,48 @@ namespace OF_DRM_Video_Downloader
                                             }
                                         }
                                     }
-                                    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
+                                    if(videos_to_download.Count > 0)
                                     {
-                                        var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
-
-                                        task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
-                                        task.StartTask();
-                                        foreach (string video in videos_to_download)
+                                        await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
                                         {
-                                            bool isNew;
-                                            if (video.Contains("cdn3.onlyfans.com/dash/files"))
+                                            var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
+
+                                            task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
+                                            task.StartTask();
+                                            foreach (string video in videos_to_download)
                                             {
-                                                string[] messageUrlParsed = video.Split(',');
-                                                string mpdURL = messageUrlParsed[0];
-                                                string policy = messageUrlParsed[1];
-                                                string signature = messageUrlParsed[2];
-                                                string kvp = messageUrlParsed[3];
-                                                string mediaId = messageUrlParsed[4];
-                                                string postId = messageUrlParsed[5];
-                                                string? licenseURL = null;
-                                                string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
-                                                if (pssh != null)
+                                                bool isNew;
+                                                if (video.Contains("cdn3.onlyfans.com/dash/files"))
                                                 {
-                                                    DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
-                                                    Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                    string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
-                                                    isNew = await downloadHelper.DownloadPurchasedPostDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
-                                                    if (isNew)
+                                                    string[] messageUrlParsed = video.Split(',');
+                                                    string mpdURL = messageUrlParsed[0];
+                                                    string policy = messageUrlParsed[1];
+                                                    string signature = messageUrlParsed[2];
+                                                    string kvp = messageUrlParsed[3];
+                                                    string mediaId = messageUrlParsed[4];
+                                                    string postId = messageUrlParsed[5];
+                                                    string? licenseURL = null;
+                                                    string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
+                                                    if (pssh != null)
                                                     {
-                                                        newPaidPostCount++;
-                                                    }
-                                                    else
-                                                    {
-                                                        oldPaidPostCount++;
+                                                        DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
+                                                        Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
+                                                        string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                        isNew = await downloadHelper.DownloadPurchasedPostDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
+                                                        if (isNew)
+                                                        {
+                                                            newPaidPostCount++;
+                                                        }
+                                                        else
+                                                        {
+                                                            oldPaidPostCount++;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
-                                    AnsiConsole.Markup($"[red]Paid Post DRM Videos Already Downloaded: {oldPaidPostCount} New Paid Post DRM Videos Downloaded: {newPaidPostCount}[/]\n");
+                                        });
+                                        AnsiConsole.Markup($"[red]Paid Post DRM Videos Skipped/Already Downloaded: {oldPaidPostCount} New Paid Post DRM Videos Downloaded: {newPaidPostCount}[/]\n");
+                                    }
                                 }
                                 else
                                 {
@@ -243,45 +243,48 @@ namespace OF_DRM_Video_Downloader
                                             }
                                         }
                                     }
-                                    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
+                                    if(videos_to_download.Count > 0)
                                     {
-                                        var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
-
-                                        task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
-                                        task.StartTask();
-                                        foreach (string video in videos_to_download)
+                                        await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
                                         {
-                                            bool isNew;
-                                            if (video.Contains("cdn3.onlyfans.com/dash/files"))
+                                            var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
+
+                                            task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
+                                            task.StartTask();
+                                            foreach (string video in videos_to_download)
                                             {
-                                                string[] messageUrlParsed = video.Split(',');
-                                                string mpdURL = messageUrlParsed[0];
-                                                string policy = messageUrlParsed[1];
-                                                string signature = messageUrlParsed[2];
-                                                string kvp = messageUrlParsed[3];
-                                                string mediaId = messageUrlParsed[4];
-                                                string postId = messageUrlParsed[5];
-                                                string? licenseURL = null;
-                                                string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
-                                                if (pssh != null)
+                                                bool isNew;
+                                                if (video.Contains("cdn3.onlyfans.com/dash/files"))
                                                 {
-                                                    DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
-                                                    Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                    string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
-                                                    isNew = await downloadHelper.DownloadPostDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
-                                                    if (isNew)
+                                                    string[] messageUrlParsed = video.Split(',');
+                                                    string mpdURL = messageUrlParsed[0];
+                                                    string policy = messageUrlParsed[1];
+                                                    string signature = messageUrlParsed[2];
+                                                    string kvp = messageUrlParsed[3];
+                                                    string mediaId = messageUrlParsed[4];
+                                                    string postId = messageUrlParsed[5];
+                                                    string? licenseURL = null;
+                                                    string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
+                                                    if (pssh != null)
                                                     {
-                                                        newPostCount++;
-                                                    }
-                                                    else
-                                                    {
-                                                        newPostCount++;
+                                                        DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
+                                                        Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
+                                                        string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                        isNew = await downloadHelper.DownloadPostDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
+                                                        if (isNew)
+                                                        {
+                                                            newPostCount++;
+                                                        }
+                                                        else
+                                                        {
+                                                            newPostCount++;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
-                                    AnsiConsole.Markup($"[red]Post DRM Videos Already Downloaded: {oldPostCount} New Paid Post DRM Videos Downloaded: {newPostCount}[/]\n");
+                                        });
+                                        AnsiConsole.Markup($"[red]Post DRM Videos Skipped/Already Downloaded: {oldPostCount} New Paid Post DRM Videos Downloaded: {newPostCount}[/]\n");
+                                    }
                                 }
                                 else
                                 {
@@ -330,45 +333,48 @@ namespace OF_DRM_Video_Downloader
                                             }
                                         }
                                     }
-                                    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
+                                    if(videos_to_download.Count > 0)
                                     {
-                                        var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
-
-                                        task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
-                                        task.StartTask();
-                                        foreach (string video in videos_to_download)
+                                        await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
                                         {
-                                            bool isNew;
-                                            if (video.Contains("cdn3.onlyfans.com/dash/files"))
+                                            var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
+
+                                            task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
+                                            task.StartTask();
+                                            foreach (string video in videos_to_download)
                                             {
-                                                string[] messageUrlParsed = video.Split(',');
-                                                string mpdURL = messageUrlParsed[0];
-                                                string policy = messageUrlParsed[1];
-                                                string signature = messageUrlParsed[2];
-                                                string kvp = messageUrlParsed[3];
-                                                string mediaId = messageUrlParsed[4];
-                                                string postId = messageUrlParsed[5];
-                                                string? licenseURL = null;
-                                                string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
-                                                if (pssh != null)
+                                                bool isNew;
+                                                if (video.Contains("cdn3.onlyfans.com/dash/files"))
                                                 {
-                                                    DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
-                                                    Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                    string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
-                                                    isNew = await downloadHelper.DownloadArchivedDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
-                                                    if (isNew)
+                                                    string[] messageUrlParsed = video.Split(',');
+                                                    string mpdURL = messageUrlParsed[0];
+                                                    string policy = messageUrlParsed[1];
+                                                    string signature = messageUrlParsed[2];
+                                                    string kvp = messageUrlParsed[3];
+                                                    string mediaId = messageUrlParsed[4];
+                                                    string postId = messageUrlParsed[5];
+                                                    string? licenseURL = null;
+                                                    string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
+                                                    if (pssh != null)
                                                     {
-                                                        newArchivedCount++;
-                                                    }
-                                                    else
-                                                    {
-                                                        oldArchivedCount++;
+                                                        DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
+                                                        Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
+                                                        string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                        isNew = await downloadHelper.DownloadArchivedDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
+                                                        if (isNew)
+                                                        {
+                                                            newArchivedCount++;
+                                                        }
+                                                        else
+                                                        {
+                                                            oldArchivedCount++;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
-                                    AnsiConsole.Markup($"[red]Archived Post DRM Videos Already Downloaded: {oldArchivedCount} New Archived Post DRM Videos Downloaded: {newArchivedCount}[/]\n");
+                                        });
+                                        AnsiConsole.Markup($"[red]Archived Post DRM Videos Skipped/Already Downloaded: {oldArchivedCount} New Archived Post DRM Videos Downloaded: {newArchivedCount}[/]\n");
+                                    }
                                 }
                                 else
                                 {
@@ -397,6 +403,7 @@ namespace OF_DRM_Video_Downloader
                                     }
                                     else if (messagesSelection.Contains("[red]All[/]"))
                                     {
+                                        AnsiConsole.Markup("[red]You selected to download all message videos[/]\n");
                                         foreach (KeyValuePair<long, DateTime> p in messages.Messages)
                                         {
                                             videos_to_download.AddRange(messages.Video_URLS[p.Key]);
@@ -404,6 +411,7 @@ namespace OF_DRM_Video_Downloader
                                     }
                                     else
                                     {
+                                        AnsiConsole.Markup($"[red]You selected to download {messagesSelection.Count} paid message videos[/]\n");
                                         foreach (string video in messagesSelection)
                                         {
                                             string pattern = @"Message ID: (\d+)";
@@ -415,45 +423,48 @@ namespace OF_DRM_Video_Downloader
                                             }
                                         }
                                     }
-                                    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
+                                    if(videos_to_download.Count > 0)
                                     {
-                                        var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
-
-                                        task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
-                                        task.StartTask();
-                                        foreach (string video in videos_to_download)
+                                        await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
                                         {
-                                            bool isNew;
-                                            if (video.Contains("cdn3.onlyfans.com/dash/files"))
+                                            var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
+
+                                            task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
+                                            task.StartTask();
+                                            foreach (string video in videos_to_download)
                                             {
-                                                string[] messageUrlParsed = video.Split(',');
-                                                string mpdURL = messageUrlParsed[0];
-                                                string policy = messageUrlParsed[1];
-                                                string signature = messageUrlParsed[2];
-                                                string kvp = messageUrlParsed[3];
-                                                string mediaId = messageUrlParsed[4];
-                                                string postId = messageUrlParsed[5];
-                                                string? licenseURL = null;
-                                                string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
-                                                if (pssh != null)
+                                                bool isNew;
+                                                if (video.Contains("cdn3.onlyfans.com/dash/files"))
                                                 {
-                                                    DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
-                                                    Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                    string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
-                                                    isNew = await downloadHelper.DownloadMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
-                                                    if (isNew)
+                                                    string[] messageUrlParsed = video.Split(',');
+                                                    string mpdURL = messageUrlParsed[0];
+                                                    string policy = messageUrlParsed[1];
+                                                    string signature = messageUrlParsed[2];
+                                                    string kvp = messageUrlParsed[3];
+                                                    string mediaId = messageUrlParsed[4];
+                                                    string postId = messageUrlParsed[5];
+                                                    string? licenseURL = null;
+                                                    string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
+                                                    if (pssh != null)
                                                     {
-                                                        newMessageCount++;
-                                                    }
-                                                    else
-                                                    {
-                                                        oldMessageCount++;
+                                                        DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
+                                                        Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/message/{postId}", "?type=widevine", auth);
+                                                        string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/message/{postId}?type=widevine", pssh);
+                                                        isNew = await downloadHelper.DownloadMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
+                                                        if (isNew)
+                                                        {
+                                                            newMessageCount++;
+                                                        }
+                                                        else
+                                                        {
+                                                            oldMessageCount++;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
-                                    AnsiConsole.Markup($"[red]Message DRM Videos Already Downloaded: {oldMessageCount} New Message DRM Videos Downloaded: {newMessageCount}[/]\n");
+                                        });
+                                        AnsiConsole.Markup($"[red]Message DRM Videos Skipped/Already Downloaded: {oldMessageCount} New Message DRM Videos Downloaded: {newMessageCount}[/]\n");
+                                    }
                                 }
                                 else
                                 {
@@ -478,10 +489,11 @@ namespace OF_DRM_Video_Downloader
                                     List<string> videos_to_download = new List<string>();
                                     if (paidMessagesSelection.Contains("[red]None[/]"))
                                     {
-                                        AnsiConsole.Markup("[red]You selected to download 0 videos[/]\n");
+                                        AnsiConsole.Markup("[red]You selected to download 0 paid message videos[/]\n");
                                     }
                                     else if (paidMessagesSelection.Contains("[red]All[/]"))
                                     {
+                                        AnsiConsole.Markup("[red]You selected to download all paid message videos[/]\n");
                                         foreach (KeyValuePair<long, DateTime> p in paidMessages.PaidMessages)
                                         {
                                             videos_to_download.AddRange(paidMessages.Video_URLS[p.Key]);
@@ -489,6 +501,7 @@ namespace OF_DRM_Video_Downloader
                                     }
                                     else
                                     {
+                                        AnsiConsole.Markup($"[red]You selected to download {paidMessagesSelection.Count} paid message videos[/]\n");
                                         foreach (string video in paidMessagesSelection)
                                         {
                                             string pattern = @"Message ID: (\d+)";
@@ -500,45 +513,48 @@ namespace OF_DRM_Video_Downloader
                                             }
                                         }
                                     }
-                                    await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
+                                    if(videos_to_download.Count > 0)
                                     {
-                                        var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
-
-                                        task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
-                                        task.StartTask();
-                                        foreach (string video in videos_to_download)
+                                        await AnsiConsole.Progress().Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new DownloadedColumn(), new RemainingTimeColumn()).StartAsync(async ctx =>
                                         {
-                                            bool isNew;
-                                            if (video.Contains("cdn3.onlyfans.com/dash/files"))
+                                            var task = ctx.AddTask($"[red]Downloading {videos_to_download.Count} Video(s)[/]", autoStart: false);
+
+                                            task.MaxValue = await downloadHelper.CalculateTotalFileSize(videos_to_download, auth);
+                                            task.StartTask();
+                                            foreach (string video in videos_to_download)
                                             {
-                                                string[] messageUrlParsed = video.Split(',');
-                                                string mpdURL = messageUrlParsed[0];
-                                                string policy = messageUrlParsed[1];
-                                                string signature = messageUrlParsed[2];
-                                                string kvp = messageUrlParsed[3];
-                                                string mediaId = messageUrlParsed[4];
-                                                string postId = messageUrlParsed[5];
-                                                string? licenseURL = null;
-                                                string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
-                                                if (pssh != null)
+                                                bool isNew;
+                                                if (video.Contains("cdn3.onlyfans.com/dash/files"))
                                                 {
-                                                    DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
-                                                    Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                    string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
-                                                    isNew = await downloadHelper.DownloadPaidMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
-                                                    if (isNew)
+                                                    string[] messageUrlParsed = video.Split(',');
+                                                    string mpdURL = messageUrlParsed[0];
+                                                    string policy = messageUrlParsed[1];
+                                                    string signature = messageUrlParsed[2];
+                                                    string kvp = messageUrlParsed[3];
+                                                    string mediaId = messageUrlParsed[4];
+                                                    string postId = messageUrlParsed[5];
+                                                    string? licenseURL = null;
+                                                    string? pssh = await apiHelper.GetDRMMPDPSSH(mpdURL, policy, signature, kvp, auth);
+                                                    if (pssh != null)
                                                     {
-                                                        newPaidMessageCount++;
-                                                    }
-                                                    else
-                                                    {
-                                                        oldPaidMessageCount++;
+                                                        DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
+                                                        Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
+                                                        string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                        isNew = await downloadHelper.DownloadPaidMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
+                                                        if (isNew)
+                                                        {
+                                                            newPaidMessageCount++;
+                                                        }
+                                                        else
+                                                        {
+                                                            oldPaidMessageCount++;
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    });
-                                    AnsiConsole.Markup($"[red]Paid Message DRM Videos Already Downloaded: {oldPaidMessageCount} New Paid Message DRM Videos Downloaded: {newPaidMessageCount}[/]\n");
+                                        });
+                                        AnsiConsole.Markup($"[red]Paid Message DRM Videos Skipped/Already Downloaded: {oldPaidMessageCount} New Paid Message DRM Videos Downloaded: {newPaidMessageCount}[/]\n");
+                                    }
                                 }
                                 else
                                 {

@@ -10,7 +10,7 @@ Extract the zip file somewhere safe using 7zip or winrar, you should have 3 file
 - OF DRM.exe
 - auth.json
 - e_sqlite3.dll
-- EXEs - this contains yt-dlp.exe, mp4decrypt.exe and ffmpeg.exe with the paths already set up correctly in the auth.json file. DO NOT TOUCH THEN IF YOU DON'T KNOW WHAT YOU ARE DOING!
+- EXEs - this contains yt-dlp.exe, mp4decrypt.exe and ffmpeg.exe with the paths already set up correctly in the auth.json file. DO NOT TOUCH THEM IF YOU DON'T KNOW WHAT YOU ARE DOING!
 
 Next you need to fill out the auth.json file.
 1. Go to www.onlyfans.com and login.

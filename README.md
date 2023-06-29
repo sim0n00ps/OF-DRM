@@ -4,7 +4,7 @@ C# console app to download DRM protected videos from Onlyfans accounts
 # Installation
 I have tried to make this a lot more simple to set up compared to [OF DL](https://github.com/sim0n00ps/OF-DL). 
 
-The only thing you need to do it go to the [releases](https://github.com/sim0n00ps/OF-DRM/releases) page and download the latest release zip file.
+The only thing you need to do is go to the [releases](https://github.com/sim0n00ps/OF-DRM/releases) page and download the latest release zip file.
 
 Extract the zip file somewhere safe using 7zip or winrar, you should have 3 files and 1 folder:
 - OF DRM.exe

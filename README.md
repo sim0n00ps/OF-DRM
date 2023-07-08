@@ -6,11 +6,12 @@ I have tried to make this a lot more simple to set up compared to [OF DL](https:
 
 The only thing you need to do is go to the [releases](https://github.com/sim0n00ps/OF-DRM/releases) page and download the latest release zip file.
 
-Extract the zip file somewhere safe using 7zip or winrar, you should have 3 files and 1 folder:
+Extract the zip file somewhere safe using 7zip or winrar, you should have 3 files and 2 folders:
 - OF DRM.exe
 - auth.json
 - e_sqlite3.dll
 - EXEs - this contains yt-dlp.exe, mp4decrypt.exe and ffmpeg.exe with the paths already set up correctly in the auth.json file. DO NOT TOUCH THEM IF YOU DON'T KNOW WHAT YOU ARE DOING!
+- cdm - this is where you need to put your device_client_id_blob and device_private_key files. They need to be placed in `cdm/devices/chrome_1610/`.
 
 Next you need to fill out the auth.json file.
 1. Go to www.onlyfans.com and login.
@@ -33,6 +34,8 @@ You should have something like this:
 `"X_BC": "2a9b28a68e7c03a9f0d3b98c28d70e8105e1f1df"` - Make sure this is set to your x-bc value
 
 `"COOKIE": "auth_id=123456789; sess=k3s9tnzdc8vt2h47ljxpmwqy5r;"` - Make sure you set auth_id to the same value as `user-id` and that you set your `sess` to your actual `sess` value, everytime you log out of Onlyfans this value will change so make sure to update it after every login.
+
+Next you will need to get 2 files, device_client_id_blob and device_private_key. These are used to get the decryption keys needed for downloading DRM videos. You can find a tutorial on how to do this here https://forum.videohelp.com/threads/408031-Dumping-Your-own-L3-CDM-with-Android-Studio
 
 Once you have filled all of the information out you can close auth.json and double click on OF DRM.exe and you should be ready to start downloading videos.
 

@@ -7,6 +7,10 @@ using Newtonsoft.Json;
 using OF_DRM_Video_Downloader.Entities;
 using HtmlAgilityPack;
 using System.Text.RegularExpressions;
+using System.Reflection.PortableExecutable;
+using WidevineClient.Widevine;
+using static WidevineClient.HttpUtil;
+using WidevineClient;
 
 namespace OF_DRM_Video_Downloader.Helpers
 {
@@ -1147,6 +1151,35 @@ namespace OF_DRM_Video_Downloader.Helpers
                     dcValue = dcElement.InnerText;
                 }
                 return dcValue;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught: {0}\n\nStackTrace: {1}", ex.Message, ex.StackTrace);
+
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine("\nInner Exception:");
+                    Console.WriteLine("Exception caught: {0}\n\nStackTrace: {1}", ex.InnerException.Message, ex.InnerException.StackTrace);
+                }
+            }
+            return null;
+        }
+        public async Task<string> GetDecryptionKeyNew(Dictionary<string, string> drmHeaders, string licenceURL, string pssh)
+        {
+            try
+            {
+                var resp1 = PostData(licenceURL, drmHeaders, new byte[] { 0x08, 0x04 });
+                var certDataB64 = Convert.ToBase64String(resp1);
+                var cdm = new CDMApi();
+                var challenge = cdm.GetChallenge(pssh, certDataB64, false, false);
+                var resp2 = PostData(licenceURL, drmHeaders, challenge);
+                var licenseB64 = Convert.ToBase64String(resp2);
+                cdm.ProvideLicense(licenseB64);
+                List<ContentKey> keys = cdm.GetKeys();
+                if(keys.Count > 0)
+                {
+                    return keys[0].ToString();
+                }
             }
             catch (Exception ex)
             {

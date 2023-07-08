@@ -174,7 +174,7 @@ namespace OF_DRM_Video_Downloader
                                                         {
                                                             DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
                                                             Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                            string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
                                                             isNew = await downloadHelper.DownloadPurchasedPostDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
                                                             if (isNew)
                                                             {
@@ -274,7 +274,7 @@ namespace OF_DRM_Video_Downloader
                                                         {
                                                             DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
                                                             Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                            string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
                                                             isNew = await downloadHelper.DownloadPostDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
                                                             if (isNew)
                                                             {
@@ -288,7 +288,7 @@ namespace OF_DRM_Video_Downloader
                                                     }
                                                 }
                                             });
-                                            AnsiConsole.Markup($"[red]Post DRM Videos Skipped/Already Downloaded: {oldPostCount} New Paid Post DRM Videos Downloaded: {newPostCount}[/]\n");
+                                            AnsiConsole.Markup($"[red]Post DRM Videos Skipped/Already Downloaded: {oldPostCount} New Post DRM Videos Downloaded: {newPostCount}[/]\n");
                                         }
                                     }
                                     else
@@ -367,7 +367,7 @@ namespace OF_DRM_Video_Downloader
                                                         {
                                                             DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
                                                             Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                            string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
                                                             isNew = await downloadHelper.DownloadArchivedDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
                                                             if (isNew)
                                                             {
@@ -460,7 +460,7 @@ namespace OF_DRM_Video_Downloader
                                                         {
                                                             DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
                                                             Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/message/{postId}", "?type=widevine", auth);
-                                                            string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/message/{postId}?type=widevine", pssh);
+                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/message/{postId}?type=widevine", pssh);
                                                             isNew = await downloadHelper.DownloadMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
                                                             if (isNew)
                                                             {
@@ -553,7 +553,7 @@ namespace OF_DRM_Video_Downloader
                                                         {
                                                             DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
                                                             Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                            string decryptionKey = await apiHelper.GetDecryptionKey(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
                                                             isNew = await downloadHelper.DownloadPaidMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
                                                             if (isNew)
                                                             {

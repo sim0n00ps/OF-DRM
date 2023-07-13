@@ -83,7 +83,7 @@ namespace OF_DRM_Video_Downloader
                         // Call the HandleUserSelection method to handle user selection and processing
                         KeyValuePair<bool, Dictionary<string, int>> hasSelectedUsersKVP = await HandleUserSelection(selectedUsers, users, lists);
 
-                        if (hasSelectedUsersKVP.Key)
+                        if (hasSelectedUsersKVP.Key && !hasSelectedUsersKVP.Value.ContainsKey("AuthChanged"))
                         {
                             // Iterate over each user in the list of users
                             foreach (KeyValuePair<string, int> user in hasSelectedUsersKVP.Value)
@@ -580,6 +580,10 @@ namespace OF_DRM_Video_Downloader
                             TimeSpan totalTime = endTime - startTime;
                             AnsiConsole.Markup($"\n[green]Scrape Completed in {totalTime.TotalMinutes.ToString("0.00")} minutes\n\n[/]");
                         }
+                        else if (hasSelectedUsersKVP.Key && hasSelectedUsersKVP.Value != null ? hasSelectedUsersKVP.Value.ContainsKey("AuthChanged") : false)
+                        {
+                            continue;
+                        }
                         else
                         {
                             break;
@@ -765,6 +769,11 @@ namespace OF_DRM_Video_Downloader
 
                             string newAuthString = JsonConvert.SerializeObject(newAuth, Formatting.Indented);
                             File.WriteAllText("auth.json", newAuthString);
+                            if (newAuth.IncludeExpiredSubscriptions != auth.IncludeExpiredSubscriptions)
+                            {
+                                auth = JsonConvert.DeserializeObject<Auth>(File.ReadAllText("auth.json"));
+                                return new KeyValuePair<bool, Dictionary<string, int>>(true, new Dictionary<string, int> { { "AuthChanged", 0 } });
+                            }
                             auth = JsonConvert.DeserializeObject<Auth>(File.ReadAllText("auth.json"));
                             break;
                         }

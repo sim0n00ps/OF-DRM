@@ -27,78 +27,102 @@ namespace OF_DRM_Video_Downloader.Helpers
             try
             {
                 int post_limit = 50;
-                int offset = 0;
-                bool loop = true;
                 Dictionary<string, string> GetParams = new Dictionary<string, string>();
+                Subscriptions subscriptions = new Subscriptions();
 
-                if (includeExpiredSubscriptions)
+                GetParams = new Dictionary<string, string>
                 {
-                    GetParams = new Dictionary<string, string>
-                    {
-                        { "limit", post_limit.ToString() },
-                        { "order", "publish_date_asc" },
-                        { "type", "all" }
-                    };
-                }
-                else
-                {
-                    GetParams = new Dictionary<string, string>
-                    {
-                        { "limit", post_limit.ToString() },
-                        { "order", "publish_date_asc" },
-                        { "type", "active" }
-                    };
-                }
+                    { "limit", post_limit.ToString() },
+                    { "order", "publish_date_asc" },
+                    { "type", "all" },
+                    { "format", "infinite"}
+                };
+
                 Dictionary<string, int> users = new Dictionary<string, int>();
-                while (loop)
+                string queryParams = "?";
+                foreach (KeyValuePair<string, string> kvp in GetParams)
                 {
-                    string queryParams = "?";
-                    foreach (KeyValuePair<string, string> kvp in GetParams)
+                    if (kvp.Key == GetParams.Keys.Last())
                     {
-                        if (kvp.Key == GetParams.Keys.Last())
+                        queryParams += $"{kvp.Key}={kvp.Value}";
+                    }
+                    else
+                    {
+                        queryParams += $"{kvp.Key}={kvp.Value}&";
+                    }
+                }
+
+                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+
+                HttpClient client = new HttpClient();
+
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + queryParams);
+
+                foreach (KeyValuePair<string, string> keyValuePair in headers)
+                {
+                    request.Headers.Add(keyValuePair.Key, keyValuePair.Value);
+                }
+                var jsonSerializerSettings = new JsonSerializerSettings();
+                jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+                using (var response = await client.SendAsync(request))
+                {
+                    response.EnsureSuccessStatusCode();
+                    var body = await response.Content.ReadAsStringAsync();
+                    subscriptions = JsonConvert.DeserializeObject<Subscriptions>(body);
+                    if (subscriptions != null && subscriptions.hasMore)
+                    {
+                        GetParams["offset"] = subscriptions.list.Count.ToString();
+                        while (true)
                         {
-                            queryParams += $"{kvp.Key}={kvp.Value}";
-                        }
-                        else
-                        {
-                            queryParams += $"{kvp.Key}={kvp.Value}&";
+                            string loopqueryParams = "?";
+                            foreach (KeyValuePair<string, string> kvp in GetParams)
+                            {
+                                if (kvp.Key == GetParams.Keys.Last())
+                                {
+                                    loopqueryParams += $"{kvp.Key}={kvp.Value}";
+                                }
+                                else
+                                {
+                                    loopqueryParams += $"{kvp.Key}={kvp.Value}&";
+                                }
+                            }
+                            Subscriptions newSubscriptions = new Subscriptions();
+                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            HttpClient loopclient = new HttpClient();
+
+                            HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
+
+                            foreach (KeyValuePair<string, string> keyValuePair in loopheaders)
+                            {
+                                looprequest.Headers.Add(keyValuePair.Key, keyValuePair.Value);
+                            }
+                            using (var loopresponse = await loopclient.SendAsync(looprequest))
+                            {
+                                loopresponse.EnsureSuccessStatusCode();
+                                var loopbody = await loopresponse.Content.ReadAsStringAsync();
+                                newSubscriptions = JsonConvert.DeserializeObject<Subscriptions>(loopbody, jsonSerializerSettings);
+                            }
+                            subscriptions.list.AddRange(newSubscriptions.list);
+                            if (!newSubscriptions.hasMore)
+                            {
+                                break;
+                            }
+                            GetParams["offset"] = Convert.ToString(Convert.ToInt32(GetParams["offset"]) + post_limit);
                         }
                     }
 
-                    Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
-
-                    HttpClient client = new HttpClient();
-
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + queryParams);
-
-                    foreach (KeyValuePair<string, string> keyValuePair in headers)
+                    if (includeExpiredSubscriptions)
                     {
-                        request.Headers.Add(keyValuePair.Key, keyValuePair.Value);
-                    }
-                    using (var response = await client.SendAsync(request))
-                    {
-                        response.EnsureSuccessStatusCode();
-                        var body = await response.Content.ReadAsStringAsync();
-                        List<Subscription> subscriptions = JsonConvert.DeserializeObject<List<Subscription>>(body);
-                        if (subscriptions != null)
+                        foreach (Subscriptions.List subscription in subscriptions.list)
                         {
-                            foreach (Subscription sub in subscriptions)
-                            {
-                                users.Add(sub.username, sub.id);
-                            }
-                            if (subscriptions.Count >= 50)
-                            {
-                                offset = offset + 50;
-                                GetParams["offset"] = Convert.ToString(offset);
-                            }
-                            else
-                            {
-                                loop = false;
-                            }
+                            users.Add(subscription.username, subscription.id);
                         }
-                        else
+                    }
+                    else
+                    {
+                        foreach (Subscriptions.List subscription in subscriptions.list.Where(s => s.subscribedBy.HasValue))
                         {
-                            loop = false;
+                            users.Add(subscription.username, subscription.id);
                         }
                     }
                 }

@@ -1229,7 +1229,7 @@ namespace OF_DRM_Video_Downloader.Helpers
             };
                 checksum = checksum + test.Sum();
             }
-            checksum = checksum + root.checksum_constant;
+            checksum = checksum + root.checksum_constant.Value;
             string sign = $"{root.start}:{hashString}:{checksum.ToString("X").ToLower()}:{root.end}";
 
             Dictionary<string, string> headers = new Dictionary<string, string>

@@ -679,6 +679,96 @@ namespace OF_DRM_Video_Downloader
                             }
                         }
                         break;
+                    case "[red]Edit Auth.json[/]":
+                        while (true)
+                        {
+                            MultiSelectionPrompt<string> multiSelectionPrompt = new MultiSelectionPrompt<string>()
+        .Title("[red]Edit Auth.json[/]")
+        .PageSize(13)
+        .AddChoices(new[] { "[red]Go Back[/]", "[red]DownloadPaidPosts[/]", "[red]DownloadPosts[/]", "[red]DownloadArchived[/]", "[red]DownloadMessages[/]", "[red]DownloadPaidMessages[/]", "[red]IncludeExpiredSubscriptions[/]" });
+                            var items = multiSelectionPrompt.GetItems();
+                            items[1].IsSelected = auth.DownloadPaidPosts;
+                            items[2].IsSelected = auth.DownloadPosts;
+                            items[3].IsSelected = auth.DownloadArchived;
+                            items[4].IsSelected = auth.DownloadMessages;
+                            items[5].IsSelected = auth.DownloadPaidMessages;
+                            items[6].IsSelected = auth.IncludeExpiredSubscriptions;
+                            var authOptions = AnsiConsole.Prompt(multiSelectionPrompt);
+
+                            if (authOptions.Contains("[red]Go Back[/]"))
+                            {
+                                break;
+                            }
+
+                            Auth newAuth = new Auth();
+                            newAuth.USER_ID = auth.USER_ID;
+                            newAuth.USER_AGENT = auth.USER_AGENT;
+                            newAuth.X_BC = auth.X_BC;
+                            newAuth.COOKIE = auth.COOKIE;
+                            newAuth.YTDLP_PATH = auth.YTDLP_PATH;
+                            newAuth.FFMPEG_PATH = auth.FFMPEG_PATH;
+                            newAuth.MP4DECRYPT_PATH = auth.MP4DECRYPT_PATH;
+
+                            if (authOptions.Contains("[red]DownloadPaidPosts[/]"))
+                            {
+                                newAuth.DownloadPaidPosts = true;
+                            }
+                            else
+                            {
+                                newAuth.DownloadPaidPosts = false;
+                            }
+
+                            if (authOptions.Contains("[red]DownloadPosts[/]"))
+                            {
+                                newAuth.DownloadPosts = true;
+                            }
+                            else
+                            {
+                                newAuth.DownloadPosts = false;
+                            }
+
+                            if (authOptions.Contains("[red]DownloadArchived[/]"))
+                            {
+                                newAuth.DownloadArchived = true;
+                            }
+                            else
+                            {
+                                newAuth.DownloadArchived = false;
+                            }
+
+                            if (authOptions.Contains("[red]DownloadMessages[/]"))
+                            {
+                                newAuth.DownloadMessages = true;
+                            }
+                            else
+                            {
+                                newAuth.DownloadMessages = false;
+                            }
+
+                            if (authOptions.Contains("[red]DownloadPaidMessages[/]"))
+                            {
+                                newAuth.DownloadPaidMessages = true;
+                            }
+                            else
+                            {
+                                newAuth.DownloadPaidMessages = false;
+                            }
+
+                            if (authOptions.Contains("[red]IncludeExpiredSubscriptions[/]"))
+                            {
+                                newAuth.IncludeExpiredSubscriptions = true;
+                            }
+                            else
+                            {
+                                newAuth.IncludeExpiredSubscriptions = false;
+                            }
+
+                            string newAuthString = JsonConvert.SerializeObject(newAuth, Formatting.Indented);
+                            File.WriteAllText("auth.json", newAuthString);
+                            auth = JsonConvert.DeserializeObject<Auth>(File.ReadAllText("auth.json"));
+                            break;
+                        }
+                        break;
                     case "[red]Exit[/]":
                         return new KeyValuePair<bool, Dictionary<string, int>>(false, null); // Return false to indicate exit
                 }
@@ -696,6 +786,7 @@ namespace OF_DRM_Video_Downloader
                     "[red]Select All[/]",
                     "[red]List[/]",
                     "[red]Custom[/]",
+                    "[red]Edit Auth.json[/]",
                     "[red]Exit[/]"
                 };
             }
@@ -705,6 +796,7 @@ namespace OF_DRM_Video_Downloader
                 {
                     "[red]Select All[/]",
                     "[red]Custom[/]",
+                    "[red]Edit Auth.json[/]",
                     "[red]Exit[/]"
                 };
             }

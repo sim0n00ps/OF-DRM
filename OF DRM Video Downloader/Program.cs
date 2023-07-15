@@ -410,7 +410,7 @@ namespace OF_DRM_Video_Downloader
                                         List<string> videos_to_download = new List<string>();
                                         if (messagesSelection.Contains("[red]None[/]"))
                                         {
-                                            AnsiConsole.Markup("[red]You selected to download 0 videos[/]\n");
+                                            AnsiConsole.Markup("[red]You selected to download 0 message videos[/]\n");
                                         }
                                         else if (messagesSelection.Contains("[red]All[/]"))
                                         {
@@ -552,8 +552,8 @@ namespace OF_DRM_Video_Downloader
                                                         if (pssh != null)
                                                         {
                                                             DateTime lastModified = await apiHelper.GetDRMMPDLastModified(mpdURL, policy, signature, kvp, auth);
-                                                            Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/post/{postId}", "?type=widevine", auth);
-                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/post/{postId}?type=widevine", pssh);
+                                                            Dictionary<string, string> drmHeaders = await apiHelper.Headers($"/api2/v2/users/media/{mediaId}/drm/message/{postId}", "?type=widevine", auth);
+                                                            string decryptionKey = await apiHelper.GetDecryptionKeyNew(drmHeaders, $"https://onlyfans.com/api2/v2/users/media/{mediaId}/drm/message/{postId}?type=widevine", pssh);
                                                             isNew = await downloadHelper.DownloadPaidMessageDRMVideo(auth.YTDLP_PATH, auth.MP4DECRYPT_PATH, auth.FFMPEG_PATH, auth.USER_AGENT, policy, signature, kvp, auth.COOKIE, mpdURL, decryptionKey, path, lastModified, Convert.ToInt64(mediaId), task);
                                                             if (isNew)
                                                             {

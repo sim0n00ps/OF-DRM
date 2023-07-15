@@ -686,17 +686,27 @@ namespace OF_DRM_Video_Downloader
                     case "[red]Edit Auth.json[/]":
                         while (true)
                         {
+                            var choices = new List<(string choice, bool isSelected)>();
+                            choices.AddRange(new[]
+                            {
+                                ( "[red]Go Back[/]", false ),
+                                ( "[red]DownloadPaidPosts[/]", auth.DownloadPaidPosts ),
+                                ( "[red]DownloadPosts[/]", auth.DownloadPosts ),
+                                ( "[red]DownloadArchived[/]", auth.DownloadArchived ),
+                                ( "[red]DownloadMessages[/]", auth.DownloadMessages ),
+                                ( "[red]DownloadPaidMessages[/]", auth.DownloadPaidMessages ),
+                                ( "[red]IncludeExpiredSubscriptions[/]", auth.IncludeExpiredSubscriptions )
+                            });
+
                             MultiSelectionPrompt<string> multiSelectionPrompt = new MultiSelectionPrompt<string>()
-        .Title("[red]Edit Auth.json[/]")
-        .PageSize(13)
-        .AddChoices(new[] { "[red]Go Back[/]", "[red]DownloadPaidPosts[/]", "[red]DownloadPosts[/]", "[red]DownloadArchived[/]", "[red]DownloadMessages[/]", "[red]DownloadPaidMessages[/]", "[red]IncludeExpiredSubscriptions[/]" });
-                            var items = multiSelectionPrompt.GetItems();
-                            items[1].IsSelected = auth.DownloadPaidPosts;
-                            items[2].IsSelected = auth.DownloadPosts;
-                            items[3].IsSelected = auth.DownloadArchived;
-                            items[4].IsSelected = auth.DownloadMessages;
-                            items[5].IsSelected = auth.DownloadPaidMessages;
-                            items[6].IsSelected = auth.IncludeExpiredSubscriptions;
+                                .Title("[red]Edit Auth.json[/]")
+                                .PageSize(7);
+
+                            foreach (var choice in choices)
+                            {
+                                multiSelectionPrompt.AddChoices(choice.choice, (selectionItem) => { if (choice.isSelected) selectionItem.Select(); });
+                            }
+
                             var authOptions = AnsiConsole.Prompt(multiSelectionPrompt);
 
                             if (authOptions.Contains("[red]Go Back[/]"))

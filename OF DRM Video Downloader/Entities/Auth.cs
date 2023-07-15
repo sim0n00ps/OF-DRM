@@ -21,6 +21,6 @@ namespace Entities
         public bool DownloadMessages { get; set; }
         public bool DownloadPaidMessages { get; set; }
         public bool IncludeExpiredSubscriptions { get; set; }
-
+        public string? DownloadPath { get; set; } = string.Empty;
     }
 }

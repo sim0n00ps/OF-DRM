@@ -89,7 +89,15 @@ namespace OF_DRM_Video_Downloader
                             foreach (KeyValuePair<string, int> user in hasSelectedUsersKVP.Value)
                             {
                                 AnsiConsole.Markup($"[red]\nScraping Data for {user.Key}\n[/]");
-                                string path = $"__user_data__/sites/OnlyFans/{user.Key}";
+                                string path = "";
+                                if (!string.IsNullOrEmpty(auth.DownloadPath))
+                                {
+                                    path = System.IO.Path.Combine(auth.DownloadPath, user.Key);
+                                }
+                                else
+                                {
+                                    path = $"__user_data__/sites/OnlyFans/{user.Key}"; // specify the path for the new folder
+                                }
                                 if (!Directory.Exists(path))
                                 {
                                     Directory.CreateDirectory(path);

@@ -115,14 +115,20 @@ namespace OF_DRM_Video_Downloader.Helpers
                     {
                         foreach (Subscriptions.List subscription in subscriptions.list)
                         {
-                            users.Add(subscription.username, subscription.id);
+                            if (!users.ContainsKey(subscription.username))
+                            {
+                                users.Add(subscription.username, subscription.id);
+                            }
                         }
                     }
                     else
                     {
                         foreach (Subscriptions.List subscription in subscriptions.list.Where(s => s.subscribedBy.HasValue))
                         {
-                            users.Add(subscription.username, subscription.id);
+                            if (!users.ContainsKey(subscription.username))
+                            {
+                                users.Add(subscription.username, subscription.id);
+                            }
                         }
                     }
                 }
@@ -188,7 +194,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                         {
                             foreach (UserList.List l in userList.list)
                             {
-                                if (IsStringOnlyDigits(l.id))
+                                if (IsStringOnlyDigits(l.id) && !lists.ContainsKey(l.name))
                                 {
                                     lists.Add(l.name, Convert.ToInt32(l.id));
                                 }

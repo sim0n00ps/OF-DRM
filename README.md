@@ -89,6 +89,7 @@ If set to `false` then any past subscriptions are excluded from the list of acco
 `DownloadPath`:
 
 If left blank then content will be downloaded to `__user_data__/sites/OnlyFans/{username}`
+
 An example is if you set the download path to `"S:/"` then content will be downloaded to `S:/{username}`
 
 # Donations

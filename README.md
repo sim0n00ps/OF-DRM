@@ -51,30 +51,37 @@ To navigate the menu the can use the &#8593; & &#8595; arrows, to select/deselec
 
 # Config Values
 `DownloadPaidPosts`:
+
 If set to `true` then any posts on the users feed that have been purchased by you and have DRM enabled videos will be scraped.
 If set to `false` no paid posts will be scraped.
 
 `DownloadPosts`:
+
 If set to `true` then any posts on the users feed that have DRM enabled videos will be scraped.
 If set to `false` no posts will be scraped.
 
 `DownloadArchived`:
+
 If set to `true` then any archived posts on the users feed that have DRM enabled videos will be scraped.
 If set to `false` no archived posts will be scraped.
 
 `DownloadMessages`:
+
 If set to `true` then any free messages that have DRM enabled videos will be scraped.
 If set to `false` no free messages will be scraped.
 
 `DownloadPaidMessages`:
+
 If set to `true` then any paid messages that have been purchased by you and have DRM enabled videos will be scraped.
 If set to `false` no paid messages will be scraped.
 
 `IncludeExpiredSubscriptions`:
+
 If set to `true` then any past subscriptions that aren't currently active are included in the list of accounts you can scrape.
 If set to `false` then any past subscriptions are excluded from the list of accounts you can scrape from.
 
-`DownloadPath`
+`DownloadPath`:
+
 If left blank then content will be downloaded to `__user_data__/sites/OnlyFans/{username}`
 An example is if you set the download path to `"S:/"` then content will be downloaded to `S:/{username}`
 

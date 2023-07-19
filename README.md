@@ -74,5 +74,9 @@ If set to `false` no paid messages will be scraped.
 If set to `true` then any past subscriptions that aren't currently active are included in the list of accounts you can scrape.
 If set to `false` then any past subscriptions are excluded from the list of accounts you can scrape from.
 
+`DownloadPath`
+If left blank then content will be downloaded to `__user_data__/sites/OnlyFans/{username}`
+An example is if you set the download path to `"S:/"` then content will be downloaded to `S:/{username}`
+
 # Donations
 If you would like to donate then here is a link to my ko-fi page https://ko-fi.com/sim0n00ps. Donations are not required but are very much appreciated:)

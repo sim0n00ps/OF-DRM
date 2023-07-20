@@ -13,7 +13,7 @@ namespace OF_DRM_Video_Downloader.Helpers
         Task<PostCollection> GetPostVideos(string endpoint, string folder, Auth auth);
         Task<ArchivedCollection> GetArchivedVideos(string endpoint, string folder, Auth auth);
         Task<MessagesCollection> GetMessageVideos(string endpoint, string folder, Auth auth);
-        Task<PaidMessagesCollection> GetPaidMessageVideos(string endpoint, string folder, Auth auth);
+        Task<PaidMessagesCollection> GetPaidMessageVideos(string endpoint, string username, string folder, Auth auth);
         Task<string> GetDRMMPDPSSH(string mpdUrl, string policy, string signature, string kvp, Auth auth);
         Task<DateTime> GetDRMMPDLastModified(string mpdUrl, string policy, string signature, string kvp, Auth auth);
         Task<string> GetDecryptionKey(Dictionary<string, string> drmHeaders, string licenceURL, string pssh);

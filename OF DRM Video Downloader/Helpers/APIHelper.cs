@@ -383,7 +383,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     { "limit", "50" },
                     { "order", "publish_date_desc" },
                     { "format", "infinite" },
-                    { "username", username }
+                    { "user_id", username }
                 };
 
                 string queryParams = "?";
@@ -455,7 +455,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                             {
                                 break;
                             }
-                            GetParams["offset"] = Convert.ToString(Convert.ToInt32(GetParams["offset"]) + Convert.ToInt32(GetParams["offset"]));
+                            GetParams["offset"] = Convert.ToString(Convert.ToInt32(GetParams["offset"]) + 50);
                         }
                     }
 
@@ -478,7 +478,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                                 foreach (Purchased.Medium media in paidpost.media)
                                 {
-                                    if (media.canView && media.files != null && media.files.drm != null && previewids.Any(cus => cus.Equals(media.id)))
+                                    if (media.canView && media.files != null && media.files.drm != null && !previewids.Any(cus => cus.Equals(media.id)))
                                     {
                                         await dBHelper.AddPost(folder, paidpost.id, paidpost.text != null ? paidpost.text : string.Empty, paidpost.price != null ? paidpost.price.ToString() : "0", paidpost.price != null && paidpost.isOpened ? true : false, paidpost.isArchived.HasValue ? paidpost.isArchived.Value : false, paidpost.createdAt != null ? paidpost.createdAt.Value : paidpost.postedAt.Value);
                                         if (!paidPostCollection.Video_URLS.ContainsKey(paidpost.id))
@@ -930,15 +930,18 @@ namespace OF_DRM_Video_Downloader.Helpers
             }
             return null;
         }
-        public async Task<PaidMessagesCollection> GetPaidMessageVideos(string endpoint, string folder, Auth auth)
+        public async Task<PaidMessagesCollection> GetPaidMessageVideos(string endpoint, string username, string folder, Auth auth)
         {
             try
             {
-                PaidMessages paidMessages = new PaidMessages();
+                Purchased paidMessages = new Purchased();
                 PaidMessagesCollection paidMessagesCollection = new PaidMessagesCollection();
                 Dictionary<string, string> GetParams = new Dictionary<string, string>
                 {
-                    { "limit", "20" }
+                    { "limit", "50" },
+                    { "order", "publish_date_desc" },
+                    { "format", "infinite" },
+                    { "user_id", username }
                 };
 
                 string queryParams = "?";
@@ -971,10 +974,10 @@ namespace OF_DRM_Video_Downloader.Helpers
                 {
                     response.EnsureSuccessStatusCode();
                     var body = await response.Content.ReadAsStringAsync();
-                    paidMessages = JsonConvert.DeserializeObject<PaidMessages>(body, jsonSerializerSettings);
+                    paidMessages = JsonConvert.DeserializeObject<Purchased>(body, jsonSerializerSettings);
                     if (paidMessages != null && paidMessages.hasMore && !paidMessages.list.Any(p => p.createdAt < new DateTime(2023, 4, 1)))
                     {
-                        GetParams["last_id"] = paidMessages.nextLastId.HasValue ? paidMessages.nextLastId.Value.ToString() : "";
+                        GetParams["offset"] = paidMessages.list.Count.ToString();
                         while (true)
                         {
                             string loopqueryParams = "?";
@@ -989,7 +992,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                     loopqueryParams += $"{kvp.Key}={kvp.Value}&";
                                 }
                             }
-                            PaidMessages newPaidMessages = new PaidMessages();
+                            Purchased newPaidMessages = new Purchased();
                             Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
@@ -1003,50 +1006,49 @@ namespace OF_DRM_Video_Downloader.Helpers
                             {
                                 loopresponse.EnsureSuccessStatusCode();
                                 var loopbody = await loopresponse.Content.ReadAsStringAsync();
-                                newPaidMessages = JsonConvert.DeserializeObject<PaidMessages>(loopbody, jsonSerializerSettings);
+                                newPaidMessages = JsonConvert.DeserializeObject<Purchased>(loopbody, jsonSerializerSettings);
                             }
                             paidMessages.list.AddRange(newPaidMessages.list);
                             if (!newPaidMessages.hasMore || paidMessages.list.Any(p => p.createdAt < new DateTime(2023, 4, 1)))
                             {
                                 break;
                             }
-                            GetParams["last_id"] = newPaidMessages.nextLastId.HasValue ? newPaidMessages.nextLastId.Value.ToString() : "";
+                            GetParams["offset"] = Convert.ToString(Convert.ToInt32(GetParams["offset"]) + 50);
                         }
                     }
 
                     if (paidMessages != null && paidMessages.list.Count > 0)
                     {
-                        foreach (PaidMessages.List message in paidMessages.list)
+                        foreach (Purchased.List paidmessage in paidMessages.list)
                         {
-                            if (message.media != null && message.media.Count > 0 && message.canPurchaseReason == "opened" && message.responseType == "message")
+                            if (paidmessage.responseType == "message" && paidmessage.media != null && paidmessage.media.Count > 0)
                             {
                                 List<long> previewids = new List<long>();
-                                if (message.previews != null)
+                                if (paidmessage.previews != null)
                                 {
-                                    for (int i = 0; i < message.previews.Count; i++)
+                                    for (int i = 0; i < paidmessage.previews.Count; i++)
                                     {
-                                        if (!previewids.Contains((long)message.previews[i]))
+                                        if (!previewids.Contains((long)paidmessage.previews[i]))
                                         {
-                                            previewids.Add((long)message.previews[i]);
+                                            previewids.Add((long)paidmessage.previews[i]);
                                         }
                                     }
                                 }
-
-                                foreach (PaidMessages.Medium media in message.media)
+                                foreach (Purchased.Medium media in paidmessage.media)
                                 {
                                     if (media.canView && media.files != null && media.files.drm != null && !previewids.Any(cus => cus.Equals(media.id)))
                                     {
-                                        await dBHelper.AddMessage(folder, message.id, message.text != null ? message.text : string.Empty, message.price != null ? message.price : "0", true, false, message.createdAt, message.fromUser.id);
-                                        if (!paidMessagesCollection.Video_URLS.ContainsKey(message.id))
+                                        await dBHelper.AddMessage(folder, paidmessage.id, paidmessage.text != null ? paidmessage.text : string.Empty, paidmessage.price != null ? paidmessage.price.ToString() : "0", paidmessage.price != null && paidmessage.isOpened ? true : false, paidmessage.isArchived.HasValue ? paidmessage.isArchived.Value : false, paidmessage.createdAt != null ? paidmessage.createdAt.Value : paidmessage.postedAt.Value, paidmessage.fromUser.id);
+                                        if (!paidMessagesCollection.Video_URLS.ContainsKey(paidmessage.id))
                                         {
-                                            paidMessagesCollection.Video_URLS.Add(message.id, new List<string>());
+                                            paidMessagesCollection.Video_URLS.Add(paidmessage.id, new List<string>());
                                         }
-                                        paidMessagesCollection.Video_URLS[message.id].Add($"{media.files.drm.manifest.dash},{media.files.drm.signature.dash.CloudFrontPolicy},{media.files.drm.signature.dash.CloudFrontSignature},{media.files.drm.signature.dash.CloudFrontKeyPairId},{media.id},{message.id}");
-                                        if (!paidMessagesCollection.PaidMessages.ContainsKey(message.id))
+                                        paidMessagesCollection.Video_URLS[paidmessage.id].Add($"{media.files.drm.manifest.dash},{media.files.drm.signature.dash.CloudFrontPolicy},{media.files.drm.signature.dash.CloudFrontSignature},{media.files.drm.signature.dash.CloudFrontKeyPairId},{media.id},{paidmessage.id}");
+                                        if (!paidMessagesCollection.PaidMessages.ContainsKey(paidmessage.id))
                                         {
-                                            paidMessagesCollection.PaidMessages.Add(message.id, message.createdAt);
+                                            paidMessagesCollection.PaidMessages.Add(paidmessage.id, paidmessage.createdAt != null ? paidmessage.createdAt.Value : paidmessage.postedAt.Value);
                                         }
-                                        await dBHelper.AddMedia(folder, media.id, message.id, media.files.drm.manifest.dash, null, null, null, "Messages", media.type == "photo" ? "Images" : (media.type == "video" || media.type == "gif" ? "Videos" : (media.type == "audio" ? "Audios" : null)), previewids.Contains(media.id) ? true : false, false, null);
+                                        await dBHelper.AddMedia(folder, media.id, media.id, media.files.drm.manifest.dash, null, null, null, "Posts", media.type == "photo" ? "Images" : (media.type == "video" || media.type == "gif" ? "Videos" : (media.type == "audio" ? "Audios" : null)), previewids.Contains(media.id) ? true : false, false, null);
                                     }
                                 }
                             }

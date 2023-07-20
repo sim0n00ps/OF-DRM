@@ -493,7 +493,7 @@ namespace OF_DRM_Video_Downloader
                                 if (auth.DownloadPaidMessages)
                                 {
                                     AnsiConsole.Markup($"[red]Getting Paid Messages\n[/]");
-                                    PaidMessagesCollection paidMessages = await apiHelper.GetPaidMessageVideos($"/chats/{user.Value}/media/videos", path, auth);
+                                    PaidMessagesCollection paidMessages = await apiHelper.GetPaidMessageVideos("/posts/paid", user.Key, path, auth);
                                     if (paidMessages != null && paidMessages.Video_URLS.Count > 0 && paidMessages.PaidMessages.Count > 0)
                                     {
                                         AnsiConsole.Markup($"[red]Found {paidMessages.Video_URLS.Count} Paid Messages with DRM Video(s)\n[/]");

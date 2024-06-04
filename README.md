@@ -36,6 +36,7 @@ You should have something like this:
 `"COOKIE": "auth_id=123456789; sess=k3s9tnzdc8vt2h47ljxpmwqy5r;"` - Make sure you set auth_id to the same value as `user-id` and that you set your `sess` to your actual `sess` value, everytime you log out of Onlyfans this value will change so make sure to update it after every login.
 
 Next you will need to get 2 files, device_client_id_blob and device_private_key. These are used to get the decryption keys needed for downloading DRM videos. You can find a tutorial on how to do this here https://forum.videohelp.com/threads/408031-Dumping-Your-own-L3-CDM-with-Android-Studio
+Make sure you remove the file extensions when renaming the 2 files, and move both files into `cdm/devices/chrome_1610/`.
 
 Once you have filled all of the information out you can close auth.json and double click on OF DRM.exe and you should be ready to start downloading videos.
 

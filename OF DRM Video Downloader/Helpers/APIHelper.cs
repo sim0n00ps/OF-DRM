@@ -1227,56 +1227,44 @@ namespace OF_DRM_Video_Downloader.Helpers
         }
         public async Task<Dictionary<string, string>> Headers(string path, string queryParams, Auth auth)
         {
-            DynamicRules root = new DynamicRules();
-            var client = new HttpClient();
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("https://raw.githubusercontent.com/Growik/onlyfans-dynamic-rules/main/rules.json"),
-            };
-            using (var vresponse = client.Send(request))
-            {
-                vresponse.EnsureSuccessStatusCode();
-                var body = await vresponse.Content.ReadAsStringAsync();
-                root = JsonConvert.DeserializeObject<DynamicRules>(body);
-            }
+			DynamicRules? root;
+			var client = new HttpClient();
+			var request = new HttpRequestMessage
+			{
+				Method = HttpMethod.Get,
+				RequestUri = new Uri("https://raw.githubusercontent.com/Growik/onlyfans-dynamic-rules/main/rules.json"),
+			};
+			using (var vresponse = client.Send(request))
+			{
+				vresponse.EnsureSuccessStatusCode();
+				var body = await vresponse.Content.ReadAsStringAsync();
+				root = JsonConvert.DeserializeObject<DynamicRules>(body);
+			}
 
-            long timestamp = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+			DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
+			long timestamp = dto.ToUnixTimeMilliseconds();
 
-            string input = $"{root.static_param}\n{timestamp}\n{path + queryParams}\n{auth.USER_ID}";
-            string hashString = string.Empty;
-            using (SHA1 sha1 = SHA1.Create())
-            {
-                byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-                byte[] hashBytes = sha1.ComputeHash(inputBytes);
-                hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-            }
+			string input = $"{root!.StaticParam}\n{timestamp}\n{path + queryParams}\n{auth.USER_ID}";
+			byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+			byte[] hashBytes = SHA1.HashData(inputBytes);
+			string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 
-            int checksum = 0;
-            foreach (int number in root.checksum_indexes)
-            {
-                List<int> test = new List<int>
-            {
-                hashString[number]
-            };
-                checksum = checksum + test.Sum();
-            }
-            checksum = checksum + root.checksum_constant.Value;
-            string sign = $"{root.start}:{hashString}:{checksum.ToString("X").ToLower()}:{root.end}";
+			var checksum = root.ChecksumIndexes.Aggregate(0, (current, number) => current + hashString[number]) + root.ChecksumConstant!.Value;
+			var sign = $"{root.Prefix}:{hashString}:{checksum.ToString("X").ToLower()}:{root.Suffix}";
 
-            Dictionary<string, string> headers = new Dictionary<string, string>
-            {
-                { "accept", "application/json, text/plain" },
-                { "app-token", root.app_token },
-                { "cookie", auth.COOKIE },
-                { "sign", sign },
-                { "time", timestamp.ToString() },
-                { "user-id", auth.USER_ID },
-                { "user-agent", auth.USER_AGENT },
-                { "x-bc", auth.X_BC }
-            };
-            return headers;
-        }
+			Dictionary<string, string> headers = new()
+		{
+			{ "accept", "application/json, text/plain" },
+			{ "app-token", root.AppToken! },
+			{ "cookie", auth!.COOKIE! },
+			{ "sign", sign },
+			{ "time", timestamp.ToString() },
+			{ "user-id", auth!.USER_ID! },
+			{ "user-agent", auth!.USER_AGENT! },
+			{ "x-bc", auth!.X_BC! }
+		};
+			return headers;
+		}
         public static bool IsStringOnlyDigits(string input)
         {
             foreach (char c in input)

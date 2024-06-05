@@ -1232,7 +1232,7 @@ namespace OF_DRM_Video_Downloader.Helpers
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri("https://github.com/Growik/onlyfans-dynamic-rules/blob/main/rules.json"),
+                RequestUri = new Uri("https://raw.githubusercontent.com/Growik/onlyfans-dynamic-rules/main/rules.json"),
             };
             using (var vresponse = client.Send(request))
             {

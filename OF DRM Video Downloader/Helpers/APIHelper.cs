@@ -1,16 +1,12 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using System.Xml.Linq;
-using System.Xml;
-using Entities;
+﻿using Entities;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using OF_DRM_Video_Downloader.Entities;
-using HtmlAgilityPack;
-using System.Text.RegularExpressions;
-using System.Reflection.PortableExecutable;
+using System.Security.Cryptography;
+using System.Text;
+using System.Xml.Linq;
 using WidevineClient.Widevine;
 using static WidevineClient.HttpUtil;
-using WidevineClient;
 
 namespace OF_DRM_Video_Downloader.Helpers
 {
@@ -52,7 +48,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -87,7 +83,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                             }
                             Subscriptions newSubscriptions = new Subscriptions();
-                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            Dictionary<string, string> loopheaders = Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
                             HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
@@ -175,7 +171,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                         }
                     }
 
-                    Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                    Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                     HttpClient client = new HttpClient();
 
@@ -256,7 +252,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                         }
                     }
 
-                    Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                    Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                     HttpClient client = new HttpClient();
 
@@ -332,7 +328,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -399,7 +395,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -435,7 +431,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                             }
                             Purchased newPaidPosts = new Purchased();
-                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            Dictionary<string, string> loopheaders = Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
                             HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
@@ -537,7 +533,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -573,7 +569,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                             }
                             Post newposts = new Post();
-                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            Dictionary<string, string> loopheaders = Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
                             HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
@@ -679,7 +675,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -715,7 +711,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                             }
                             Archived newArchived = new Archived();
-                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            Dictionary<string, string> loopheaders = Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
                             HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
@@ -818,7 +814,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -854,7 +850,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                             }
                             Messages newMessages = new Messages();
-                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            Dictionary<string, string> loopheaders = Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
                             HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
@@ -957,7 +953,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                     }
                 }
 
-                Dictionary<string, string> headers = await Headers("/api2/v2" + endpoint, queryParams, auth);
+                Dictionary<string, string> headers = Headers("/api2/v2" + endpoint, queryParams, auth);
 
                 HttpClient client = new HttpClient();
 
@@ -993,7 +989,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                                 }
                             }
                             Purchased newPaidMessages = new Purchased();
-                            Dictionary<string, string> loopheaders = await Headers("/api2/v2" + endpoint, loopqueryParams, auth);
+                            Dictionary<string, string> loopheaders = Headers("/api2/v2" + endpoint, loopqueryParams, auth);
                             HttpClient loopclient = new HttpClient();
 
                             HttpRequestMessage looprequest = new HttpRequestMessage(HttpMethod.Get, "https://onlyfans.com/api2/v2" + endpoint + loopqueryParams);
@@ -1208,7 +1204,7 @@ namespace OF_DRM_Video_Downloader.Helpers
                 var licenseB64 = Convert.ToBase64String(resp2);
                 cdm.ProvideLicense(licenseB64);
                 List<ContentKey> keys = cdm.GetKeys();
-                if(keys.Count > 0)
+                if (keys.Count > 0)
                 {
                     return keys[0].ToString();
                 }
@@ -1225,46 +1221,35 @@ namespace OF_DRM_Video_Downloader.Helpers
             }
             return null;
         }
-        public async Task<Dictionary<string, string>> Headers(string path, string queryParams, Auth auth)
+        public Dictionary<string, string> Headers(string path, string queryParams, Auth auth)
         {
-			DynamicRules? root;
-			var client = new HttpClient();
-			var request = new HttpRequestMessage
-			{
-				Method = HttpMethod.Get,
-				RequestUri = new Uri("https://raw.githubusercontent.com/Growik/onlyfans-dynamic-rules/main/rules.json"),
-			};
-			using (var vresponse = client.Send(request))
-			{
-				vresponse.EnsureSuccessStatusCode();
-				var body = await vresponse.Content.ReadAsStringAsync();
-				root = JsonConvert.DeserializeObject<DynamicRules>(body);
-			}
+            DynamicRules? root;
+            root = JsonConvert.DeserializeObject<DynamicRules>(File.ReadAllText("rules.json"));
 
-			DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
-			long timestamp = dto.ToUnixTimeMilliseconds();
+            DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
+            long timestamp = dto.ToUnixTimeMilliseconds();
 
-			string input = $"{root!.StaticParam}\n{timestamp}\n{path + queryParams}\n{auth.USER_ID}";
-			byte[] inputBytes = Encoding.UTF8.GetBytes(input);
-			byte[] hashBytes = SHA1.HashData(inputBytes);
-			string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            string input = $"{root!.StaticParam}\n{timestamp}\n{path + queryParams}\n{auth.USER_ID}";
+            byte[] inputBytes = Encoding.UTF8.GetBytes(input);
+            byte[] hashBytes = SHA1.HashData(inputBytes);
+            string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 
-			var checksum = root.ChecksumIndexes.Aggregate(0, (current, number) => current + hashString[number]) + root.ChecksumConstant!.Value;
-			var sign = $"{root.Prefix}:{hashString}:{checksum.ToString("X").ToLower()}:{root.Suffix}";
+            var checksum = root.ChecksumIndexes.Aggregate(0, (current, number) => current + hashString[number]) + root.ChecksumConstant!.Value;
+            var sign = $"{root.Prefix}:{hashString}:{checksum.ToString("X").ToLower()}:{root.Suffix}";
 
-			Dictionary<string, string> headers = new()
-		{
-			{ "accept", "application/json, text/plain" },
-			{ "app-token", root.AppToken! },
-			{ "cookie", auth!.COOKIE! },
-			{ "sign", sign },
-			{ "time", timestamp.ToString() },
-			{ "user-id", auth!.USER_ID! },
-			{ "user-agent", auth!.USER_AGENT! },
-			{ "x-bc", auth!.X_BC! }
-		};
-			return headers;
-		}
+            Dictionary<string, string> headers = new()
+            {
+                { "accept", "application/json, text/plain" },
+                { "app-token", root.AppToken! },
+                { "cookie", auth!.COOKIE! },
+                { "sign", sign },
+                { "time", timestamp.ToString() },
+                { "user-id", auth!.USER_ID! },
+                { "user-agent", auth!.USER_AGENT! },
+                { "x-bc", auth!.X_BC! }
+            };
+            return headers;
+        }
         public static bool IsStringOnlyDigits(string input)
         {
             foreach (char c in input)

@@ -18,6 +18,6 @@ namespace OF_DRM_Video_Downloader.Helpers
         Task<DateTime> GetDRMMPDLastModified(string mpdUrl, string policy, string signature, string kvp, Auth auth);
         Task<string> GetDecryptionKey(Dictionary<string, string> drmHeaders, string licenceURL, string pssh);
         Task<string> GetDecryptionKeyNew(Dictionary<string, string> drmHeaders, string licenceURL, string pssh);
-        Task<Dictionary<string, string>> Headers(string path, string queryParams, Auth auth);
+        Dictionary<string, string> Headers(string path, string queryParams, Auth auth);
     }
 }

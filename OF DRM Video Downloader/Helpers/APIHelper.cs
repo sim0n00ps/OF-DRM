@@ -1228,20 +1228,9 @@ namespace OF_DRM_Video_Downloader.Helpers
         public async Task<Dictionary<string, string>> Headers(string path, string queryParams, Auth auth)
         {
 			DynamicRules? root;
-			var client = new HttpClient();
-			var request = new HttpRequestMessage
-			{
-				Method = HttpMethod.Get,
-				RequestUri = new Uri("https://raw.githubusercontent.com/Growik/onlyfans-dynamic-rules/main/rules.json"),
-			};
-			using (var vresponse = client.Send(request))
-			{
-				vresponse.EnsureSuccessStatusCode();
-				var body = await vresponse.Content.ReadAsStringAsync();
-				root = JsonConvert.DeserializeObject<DynamicRules>(body);
-			}
+            root = JsonConvert.DeserializeObject<DynamicRules>(File.ReadAllText("rules.json"));
 
-			DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
+            DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
 			long timestamp = dto.ToUnixTimeMilliseconds();
 
 			string input = $"{root!.StaticParam}\n{timestamp}\n{path + queryParams}\n{auth.USER_ID}";

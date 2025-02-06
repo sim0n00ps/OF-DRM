@@ -1224,9 +1224,19 @@ namespace OF_DRM_Video_Downloader.Helpers
         public Dictionary<string, string> Headers(string path, string queryParams, Auth auth)
         {
             DynamicRules? root;
-            root = JsonConvert.DeserializeObject<DynamicRules>(File.ReadAllText("rules.json"));
 
-            DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
+			//Get rules from GitHub and fallback to local file
+			string? dynamicRulesJSON = GetDynamicRules();
+			if (!string.IsNullOrEmpty(dynamicRulesJSON))
+			{
+				root = JsonConvert.DeserializeObject<DynamicRules>(dynamicRulesJSON);
+			}
+			else
+			{
+				root = JsonConvert.DeserializeObject<DynamicRules>(File.ReadAllText("rules.json"));
+			}
+
+			DateTimeOffset dto = (DateTimeOffset)DateTime.UtcNow;
             long timestamp = dto.ToUnixTimeMilliseconds();
 
             string input = $"{root!.StaticParam}\n{timestamp}\n{path + queryParams}\n{auth.USER_ID}";
@@ -1250,7 +1260,38 @@ namespace OF_DRM_Video_Downloader.Helpers
             };
             return headers;
         }
-        public static bool IsStringOnlyDigits(string input)
+
+		public static string? GetDynamicRules()
+		{
+			try
+			{
+				HttpClient client = new HttpClient();
+				HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://raw.githubusercontent.com/deviint/onlyfans-dynamic-rules/main/dynamicRules.json");
+				using var response = client.Send(request);
+
+				if (!response.IsSuccessStatusCode)
+				{
+					
+					return null;
+				}
+
+				var body = response.Content.ReadAsStringAsync().Result;
+
+				return body;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Exception caught: {0}\n\nStackTrace: {1}", ex.Message, ex.StackTrace);
+				if (ex.InnerException != null)
+				{
+					Console.WriteLine("\nInner Exception:");
+					Console.WriteLine("Exception caught: {0}\n\nStackTrace: {1}", ex.InnerException.Message, ex.InnerException.StackTrace);
+				}
+			}
+			return null;
+		}
+
+		public static bool IsStringOnlyDigits(string input)
         {
             foreach (char c in input)
             {

@@ -102,7 +102,6 @@ namespace OF_DRM_Video_Downloader.Entities
 			public string? price { get; set; }
 			public string? regularPrice { get; set; }
 			public string? discount { get; set; }
-			public int? earningId { get; set; }
 			public string action { get; set; }
 			public string type { get; set; }
 			public object offerStart { get; set; }
